@@ -16,6 +16,7 @@ import Activity from "./pages/dashboard/Activity";
 import ConflictCenter from "./pages/dashboard/ConflictCenter";
 import Account from "./pages/dashboard/Account";
 import Settings from "./pages/dashboard/Settings";
+import Signup from "./pages/Signup";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
         
         {/* Dashboard Routes */}
         <Route path="/dashboard" element={<DashboardLayout />}>
