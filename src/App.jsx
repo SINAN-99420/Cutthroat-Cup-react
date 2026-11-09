@@ -16,7 +16,7 @@ import Activity from "./pages/dashboard/Activity";
 import ConflictCenter from "./pages/dashboard/ConflictCenter";
 import Account from "./pages/dashboard/Account";
 import Settings from "./pages/dashboard/Settings";
-import Signup from "./pages/Signup";
+import Signup from "./pages/dashboard/Signup";
 
 function App() {
   return (
