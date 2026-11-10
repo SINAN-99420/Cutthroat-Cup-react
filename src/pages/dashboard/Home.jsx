@@ -6,6 +6,7 @@ import {
   ChevronRight, ArrowRight, User,
 } from "lucide-react";
 import HeaderActions from "../../layouts/HeaderActions";
+import Loader from "../../layouts/Loader"; // <-- Loader Import Cheythu
 
 const ACTIONS = [
   { Icon: Swords, color: "#FF2D2D", title: "Conflict cut", desc: "Brazil vs Spain", time: "Due in 12h" },
@@ -72,7 +73,8 @@ export default function Home() {
       });
   }, [navigate]);
 
-  if (!data) return <div className="p-6 text-gray-400 font-['Poppins',sans-serif]">Loading dashboard...</div>;
+  // Ithaanu puthiya Loader
+  if (!data) return <Loader message="Loading your dashboard..." />;
 
   const leagues = data.my_leagues || [];
   const publicCount = leagues.filter((l) => l.is_public).length;
@@ -98,16 +100,16 @@ export default function Home() {
     : UPCOMING_FALLBACK;
 
   return (
-    <div className="w-full bg-[#050505] text-white font-['Poppins',sans-serif] px-6 py-5">
+    <div className="w-full max-w-[100vw] bg-[#050505] text-white font-['Poppins',sans-serif] px-4 md:px-6 py-5 pb-20 md:pb-5 overflow-x-hidden">
       
       {/* Top Header Row */}
-      <div className="flex items-start justify-between gap-6 mb-5">
-        <div>
-          <h1 className="text-[24px] leading-tight font-light">
+      <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 md:gap-6 mb-5 w-full">
+        <div className="w-full md:w-auto overflow-hidden">
+          <h1 className="text-[20px] md:text-[24px] leading-tight font-light truncate">
             Welcome back, <span className="font-semibold">{userName}</span>
           </h1>
-          <p className="text-[12px] text-gray-400 mt-0.5">
-            Manage your clubs, survive conflict cuts, and grow your wallet through the World Cup.
+          <p className="text-[11px] md:text-[12px] text-gray-400 mt-0.5 truncate">
+            Manage your clubs, survive conflict cuts, and grow your wallet.
           </p>
         </div>
         <HeaderActions name={userName} balance={money(data.wallet.balance)} />
@@ -131,22 +133,22 @@ export default function Home() {
 
           {/* My leagues */}
           <Panel>
-            <div className="flex flex-wrap justify-between items-center gap-3 mb-3">
+            <div className="flex flex-col xl:flex-row xl:justify-between xl:items-center gap-3 mb-3">
               <h2 className="font-semibold text-[13px] tracking-wide text-gray-200">MY LEAGUES</h2>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <Tab active={filter === "all"} onClick={() => setFilter("all")}>All ({leagues.length})</Tab>
                 <Tab active={filter === "public"} onClick={() => setFilter("public")}>Public ({publicCount})</Tab>
                 <Tab active={filter === "private"} onClick={() => setFilter("private")}>Private ({privateCount})</Tab>
                 <button
                   onClick={() => navigate("/dashboard/leagues")}
-                  className="ml-2 bg-[#39FF14] hover:bg-[#4dff2e] text-black px-3 py-1.5 rounded text-[11px] font-bold flex items-center gap-1 transition"
+                  className="ml-0 md:ml-2 bg-[#39FF14] hover:bg-[#4dff2e] text-black px-3 py-1.5 rounded text-[11px] font-bold flex items-center gap-1 transition whitespace-nowrap"
                 >
-                  Create private league <ArrowRight size={12} />
+                  Create league <ArrowRight size={12} />
                 </button>
               </div>
             </div>
 
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 overflow-x-auto custom-scrollbar">
               {shownLeagues.length > 0 ? (
                 shownLeagues.map((league, index) => (
                   <LeagueRow
@@ -164,7 +166,7 @@ export default function Home() {
                 ))
               ) : (
                 <div className="text-[12px] text-gray-500 py-4 text-center border border-dashed border-[#262626] rounded-lg">
-                  You haven't joined any leagues yet. Go to Leagues tab!
+                  You haven't joined any leagues yet.
                 </div>
               )}
             </div>
@@ -175,7 +177,7 @@ export default function Home() {
             <div className="px-4 py-2 bg-gradient-to-r from-[#133B11] to-transparent border-b border-[#1F1F1F]">
               <h2 className="font-semibold text-[12px] tracking-wide text-gray-300">RECOMMENDED PUBLIC LEAGUE</h2>
             </div>
-            <div className="flex flex-wrap items-center justify-between gap-3 p-3">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-3">
               <div className="flex items-center gap-3">
                 <div className="w-[50px] h-[50px] rounded-lg bg-[#1A1A1A] flex items-center justify-center overflow-hidden shrink-0">
                   {rec.image ? <img src={rec.image} alt="" className="w-full h-full object-cover" /> : <Trophy size={24} className="text-[#f2c94c]" />}
@@ -188,7 +190,7 @@ export default function Home() {
                   <p className="text-[10px] text-gray-400 mt-0.5">{rec.subtitle}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-between md:justify-end">
                 <div className="flex items-center">
                   {["#5B9BD5", "#555", "#8a7a6a", "#3f6f8f"].map((c, i) => (
                     <div key={i} className="w-6 h-6 rounded-full border border-[#0D0D0D] -ml-1.5 first:ml-0" style={{ background: c }} />
@@ -203,76 +205,6 @@ export default function Home() {
                 </button>
               </div>
             </div>
-          </div>
-
-          {/* Bottom three panels */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-            {/* Upcoming matches */}
-            <Panel title="UPCOMING MATCHES" link="View all" onLink={() => navigate("/dashboard/matches")} flush>
-              {upcoming.map((m, i) => (
-                <div key={i} className="px-3 py-2.5 border-t border-[#1F1F1F]">
-                  <div className="flex justify-between text-[9px] text-gray-500 mb-2">
-                    <span>{m.when}</span><span>{m.round}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <TeamSide team={m.a} />
-                    <span className="text-[10px] text-gray-600">VS</span>
-                    <TeamSide team={m.b} right />
-                  </div>
-                  {m.alert && (
-                    <div className="mt-2 flex items-center justify-between bg-[#E11D48]/10 border border-[#E11D48]/20 rounded px-2 py-1.5">
-                      <div className="flex items-center gap-1.5">
-                        {m.alert.lines.length > 1 && <Swords size={12} className="text-[#E11D48]" />}
-                        <div className="text-[8px] text-[#FF4D4D] leading-tight font-medium">
-                          {m.alert.lines.map((l) => <div key={l}>{l}</div>)}
-                        </div>
-                      </div>
-                      <button className="text-[10px] font-bold text-gray-300 hover:text-white">{m.alert.btn}</button>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </Panel>
-
-            {/* Waiver auctions */}
-            <Panel title="WAIVER AUCTIONS" link="View all" onLink={() => navigate("/dashboard/waivers")} flush>
-              <div className="flex justify-between px-3 py-2 text-[9px] font-bold border-t border-[#1F1F1F]">
-                <span className="text-[#FFB800]">3 AUCTIONS ENDING</span><span className="text-[#FFB800]">2h 15m</span>
-              </div>
-              {WAIVERS.map((w) => (
-                <div key={w.name} className="flex items-center justify-between px-3 py-2 border-t border-[#1F1F1F]">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[16px] leading-none">{w.flag}</span>
-                    <span className="text-[11px] font-medium text-gray-300">{w.name}</span>
-                  </div>
-                  <div className="flex gap-3 text-[10px]">
-                    <div><p className="text-[8px] text-gray-500">Top bid</p><p className="font-bold text-gray-200">{w.top}</p></div>
-                    <div><p className="text-[8px] text-gray-500">Your bid</p><p className="font-bold text-[#39FF14]">{w.yours}</p></div>
-                  </div>
-                </div>
-              ))}
-              <div className="p-3">
-                <GreenButton onClick={() => navigate("/dashboard/waivers")}>View all auctions</GreenButton>
-              </div>
-            </Panel>
-
-            {/* League standings */}
-            <Panel title="LEAGUE STANDINGS" link="View all" onLink={() => navigate("/dashboard/standings")} flush>
-              <div className="grid grid-cols-[20px_1fr_60px_50px] px-3 py-2 text-[8px] text-gray-500 border-t border-[#1F1F1F] font-bold">
-                <span>#</span><span>MANAGER</span><span className="text-right">Wallet</span><span className="text-right">+/-</span>
-              </div>
-              {STANDINGS.map((r) => (
-                <div key={r.pos} className={`grid grid-cols-[20px_1fr_60px_50px] items-center px-3 py-2 text-[10px] border-t border-[#1F1F1F] ${r.me ? "bg-[#39FF14]/10 text-white" : "text-gray-400"}`}>
-                  <span className={r.me ? "text-[#39FF14] font-bold" : ""}>{r.pos}</span>
-                  <span className="flex items-center gap-1 font-medium truncate"><User size={10} className="text-gray-500" />{r.name}</span>
-                  <span className="font-bold text-gray-200 text-right pr-1">{r.wallet}</span>
-                  <span className={`text-right font-bold ${r.up ? "text-[#39FF14]" : "text-[#FF3333]"}`}>{r.diff}</span>
-                </div>
-              ))}
-              <div className="p-3">
-                <GreenButton onClick={() => navigate("/dashboard/standings")}>Full Standings</GreenButton>
-              </div>
-            </Panel>
           </div>
         </div>
 
@@ -345,12 +277,84 @@ export default function Home() {
               ))}
             </div>
           </Panel>
-
-          {/* Tournament bracket */}
-          <Panel title="TOURNAMENT BRACKET" link="View bracket" onLink={() => navigate("/dashboard/bracket")}>
-            <Bracket />
-          </Panel>
         </div>
+      </div>
+
+      {/* ─── BOTTOM SECTION (4 Grids) ─── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
+        
+        {/* Upcoming matches */}
+        <Panel title="UPCOMING MATCHES" link="View all" onLink={() => navigate("/dashboard/matches")} flush>
+          {upcoming.map((m, i) => (
+            <div key={i} className="px-3 py-2.5 border-t border-[#1F1F1F]">
+              <div className="flex justify-between text-[9px] text-gray-500 mb-2">
+                <span>{m.when}</span><span>{m.round}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <TeamSide team={m.a} />
+                <span className="text-[10px] text-gray-600">VS</span>
+                <TeamSide team={m.b} right />
+              </div>
+              {m.alert && (
+                <div className="mt-2 flex items-center justify-between bg-[#E11D48]/10 border border-[#E11D48]/20 rounded px-2 py-1.5">
+                  <div className="flex items-center gap-1.5">
+                    {m.alert.lines.length > 1 && <Swords size={12} className="text-[#E11D48]" />}
+                    <div className="text-[8px] text-[#FF4D4D] leading-tight font-medium">
+                      {m.alert.lines.map((l) => <div key={l}>{l}</div>)}
+                    </div>
+                  </div>
+                  <button className="text-[10px] font-bold text-gray-300 hover:text-white">{m.alert.btn}</button>
+                </div>
+              )}
+            </div>
+          ))}
+        </Panel>
+
+        {/* Waiver auctions */}
+        <Panel title="WAIVER AUCTIONS" link="View all" onLink={() => navigate("/dashboard/waivers")} flush>
+          <div className="flex justify-between px-3 py-2 text-[9px] font-bold border-t border-[#1F1F1F]">
+            <span className="text-[#FFB800]">3 AUCTIONS ENDING</span><span className="text-[#FFB800]">2h 15m</span>
+          </div>
+          {WAIVERS.map((w) => (
+            <div key={w.name} className="flex items-center justify-between px-3 py-2 border-t border-[#1F1F1F]">
+              <div className="flex items-center gap-2">
+                <span className="text-[16px] leading-none">{w.flag}</span>
+                <span className="text-[11px] font-medium text-gray-300">{w.name}</span>
+              </div>
+              <div className="flex gap-3 text-[10px]">
+                <div><p className="text-[8px] text-gray-500">Top bid</p><p className="font-bold text-gray-200">{w.top}</p></div>
+                <div><p className="text-[8px] text-gray-500">Your bid</p><p className="font-bold text-[#39FF14]">{w.yours}</p></div>
+              </div>
+            </div>
+          ))}
+          <div className="p-3">
+            <GreenButton onClick={() => navigate("/dashboard/waivers")}>View all auctions</GreenButton>
+          </div>
+        </Panel>
+
+        {/* League standings */}
+        <Panel title="LEAGUE STANDINGS" link="View all" onLink={() => navigate("/dashboard/standings")} flush>
+          <div className="grid grid-cols-[16px_1fr_60px_40px] px-3 py-2 text-[8px] text-gray-500 border-t border-[#1F1F1F] font-bold">
+            <span>#</span><span>MANAGER</span><span className="text-right">Wallet</span><span className="text-right">+/-</span>
+          </div>
+          {STANDINGS.map((r) => (
+            <div key={r.pos} className={`grid grid-cols-[16px_1fr_60px_40px] items-center px-3 py-2 text-[10px] border-t border-[#1F1F1F] ${r.me ? "bg-[#39FF14]/10 text-white" : "text-gray-400"}`}>
+              <span className={r.me ? "text-[#39FF14] font-bold" : ""}>{r.pos}</span>
+              <span className="flex items-center gap-1 font-medium truncate"><User size={10} />{r.name}</span>
+              <span className="font-bold text-gray-200 text-right pr-1">{r.wallet}</span>
+              <span className={`text-right font-bold ${r.up ? "text-[#39FF14]" : "text-[#FF3333]"}`}>{r.diff}</span>
+            </div>
+          ))}
+          <div className="p-3">
+            <GreenButton onClick={() => navigate("/dashboard/standings")}>Full Standings</GreenButton>
+          </div>
+        </Panel>
+
+        {/* Tournament bracket */}
+        <Panel title="TOURNAMENT BRACKET" link="View bracket" onLink={() => navigate("/dashboard/bracket")}>
+          <Bracket />
+        </Panel>
+
       </div>
     </div>
   );
@@ -362,7 +366,7 @@ export default function Home() {
 
 function Panel({ title, link, onLink, badge, flush, children }) {
   return (
-    <div className={`bg-[#0D0D0D] border border-[#1F1F1F] rounded-xl ${flush ? "pb-0" : "p-3.5"} overflow-hidden`}>
+    <div className={`bg-[#0D0D0D] border border-[#1F1F1F] rounded-xl ${flush ? "pb-0" : "p-3.5"} overflow-hidden flex flex-col`}>
       {(title || link) && (
         <div className={`flex justify-between items-center ${flush ? "px-3 py-2.5" : "mb-2"}`}>
           <h2 className="font-bold text-[12px] tracking-wide text-gray-200">{title}</h2>
@@ -393,12 +397,12 @@ function StatCard({ value, label, sub, color, icon }) {
       style={{ borderColor: `${color}55`, background: `linear-gradient(180deg, #0b0b0b 35%, ${color}1A 100%)` }}
     >
       <div className="flex justify-between items-start">
-        <p className="text-[28px] leading-none font-bold" style={{ color }}>{value}</p>
+        <p className="text-[24px] md:text-[28px] leading-none font-bold" style={{ color }}>{value}</p>
         <Hex color={color}>{icon}</Hex>
       </div>
       <div className="mt-2">
-        <p className="text-[11px] font-bold text-gray-300 uppercase tracking-wider">{label}</p>
-        <p className="text-[9px] text-gray-500 mt-0.5 font-medium">{sub}</p>
+        <p className="text-[10px] md:text-[11px] font-bold text-gray-300 uppercase tracking-wider">{label}</p>
+        <p className="text-[8px] md:text-[9px] text-gray-500 mt-0.5 font-medium">{sub}</p>
       </div>
     </div>
   );
@@ -433,7 +437,7 @@ function LeagueRow({ logo, name, isPublic, subtitle, rank, total, wallet, confli
   return (
     <div
       onClick={onClick}
-      className="grid grid-cols-[minmax(0,1.8fr)_1fr_1fr_1fr_16px] items-center gap-2 px-3 py-2.5 bg-[#111] border border-[#1F1F1F] rounded-lg hover:border-[#333] transition cursor-pointer"
+      className="grid grid-cols-[minmax(0,1.8fr)_1fr_1fr_1fr_16px] items-center gap-2 px-3 py-2.5 bg-[#111] border border-[#1F1F1F] rounded-lg hover:border-[#333] transition cursor-pointer min-w-[280px]"
     >
       <div className="flex items-center gap-2.5 min-w-0">
         <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shrink-0 overflow-hidden">
@@ -487,7 +491,7 @@ function Bracket() {
   const line = "#333";
 
   return (
-    <div className="flex-1 flex flex-col justify-center">
+    <div className="flex-1 flex flex-col justify-center mt-2">
       <svg viewBox="0 0 240 200" className="w-full h-auto">
         <g fill="#666" fontSize="8" textAnchor="middle">
           <text x="12" y="10">R16</text><text x="73" y="10">QF</text><text x="128" y="10">SF</text>

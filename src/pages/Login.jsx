@@ -7,10 +7,14 @@ export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false); // <-- Loading state add cheythu
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setError("");
+    setIsLoading(true); // <-- Loading start
+
     try {
       // LIVE RENDER BACKEND URL
       const res = await axios.post("https://cutthroat-cup.onrender.com/api/login/", {
@@ -21,7 +25,8 @@ export default function Login() {
       localStorage.setItem("token", res.data.token);
       navigate("/dashboard");
     } catch (err) {
-      setError("Invalid username or password");
+      setError("Invalid credentials or server is waking up. Please try again.");
+      setIsLoading(false); // <-- Error vannal loading stop cheyyunnu
     }
   };
 
@@ -34,7 +39,11 @@ export default function Login() {
           <p className="text-gray-400 text-sm mt-2">Login to manage your leagues</p>
         </div>
 
-        {error && <div className="bg-red-500/10 border border-red-500 text-red-500 p-3 rounded mb-4 text-sm">{error}</div>}
+        {error && (
+          <div className="bg-red-500/10 border border-red-500 text-red-500 p-3 rounded mb-4 text-sm">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleLogin} className="flex flex-col gap-4">
           <div>
@@ -46,6 +55,7 @@ export default function Login() {
               className="w-full bg-[#0A0A0A] border border-[#222] rounded-md px-4 py-3 text-white focus:outline-none focus:border-[#39FF14]"
               placeholder="Enter username"
               required
+              disabled={isLoading}
             />
           </div>
           <div>
@@ -57,13 +67,22 @@ export default function Login() {
               className="w-full bg-[#0A0A0A] border border-[#222] rounded-md px-4 py-3 text-white focus:outline-none focus:border-[#39FF14]"
               placeholder="Enter password"
               required
+              disabled={isLoading}
             />
           </div>
           <button
             type="submit"
-            className="w-full bg-[#39FF14] text-black font-bold py-3 rounded-md hover:bg-green-400 transition mt-4"
+            disabled={isLoading}
+            className="w-full bg-[#39FF14] text-black font-bold py-3 rounded-md hover:bg-green-400 transition mt-4 flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Login
+            {isLoading ? (
+              <>
+                <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                Connecting...
+              </>
+            ) : (
+              "Login"
+            )}
           </button>
         </form>
         
